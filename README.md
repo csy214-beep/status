@@ -66,7 +66,7 @@ cmake .. -DCMAKE_PREFIX_PATH=C:/Qt/6.x.x/msvc2019_64
 cmake --build . --config Release
 
 # 运行
-./bin/StatusDisplayApp.exe
+./bin/status.exe
 ```
 
 ## 使用说明
@@ -186,7 +186,7 @@ m_refreshTimer->start(3000);  // 刷新间隔(毫秒)
 ```
 
 ```bash
-windeployqt StatusDisplayApp.exe
+windeployqt status.exe
 ```
 
 ## 许可证
