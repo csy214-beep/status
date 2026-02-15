@@ -18,36 +18,53 @@ class MainWindow : public QWidget {
 
 public:
     explicit MainWindow(StatusManager *manager, QWidget *parent = nullptr);
+
     ~MainWindow();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+
     void mouseMoveEvent(QMouseEvent *event) override;
+
     void mouseReleaseEvent(QMouseEvent *event) override;
+
     void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void refreshDisplay();
+
     void onStatusesChanged();
+
     void openManageDialog();
+
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+
     void toggleExpanded();
 
 private:
     void setupUI();
+
     void setupTrayIcon();
+
     void loadPosition();
+
     void savePosition();
+
     void createIconLabel(const StatusData &status);
+
     void clearIcons();
 
     StatusManager *m_statusManager;
     QVBoxLayout *m_mainLayout;
     QGridLayout *m_iconLayout;
     QTimer *m_refreshTimer;
-    QVector<QLabel*> m_iconLabels;
+    QVector<QLabel *> m_iconLabels;
     QLabel *m_emptyLabel;
     QPushButton *m_expandButton;
+
+    // 缓存状态数据
+    QVector<StatusData> m_statusesTemp = {StatusData()};
+
 
     // 系统托盘
     QSystemTrayIcon *m_trayIcon;
@@ -63,7 +80,7 @@ private:
     static const int MAX_ICONS_PER_ROW = 8;
     static const int ICON_SIZE = 48;
     static const int ICON_SPACING = 10;
-    static const int DEFAULT_SHOW_COUNT = 3;  // 默认显示数量
+    static const int DEFAULT_SHOW_COUNT = 3; // 默认显示数量
 };
 
 #endif // MAINWINDOW_H

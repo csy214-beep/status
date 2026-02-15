@@ -12,10 +12,9 @@
 
 MainWindow::MainWindow(StatusManager *manager, QWidget *parent)
     : QWidget(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
-    , m_statusManager(manager)
-    , m_dragging(false)
-    , m_expanded(false)
-{
+      , m_statusManager(manager)
+      , m_dragging(false)
+      , m_expanded(false) {
     setupUI();
     setupTrayIcon();
 
@@ -26,7 +25,7 @@ MainWindow::MainWindow(StatusManager *manager, QWidget *parent)
     // 设置定时器，每30秒刷新一次
     m_refreshTimer = new QTimer(this);
     connect(m_refreshTimer, &QTimer::timeout, this, &MainWindow::refreshDisplay);
-    m_refreshTimer->start(30000); //30秒
+    m_refreshTimer->start(1000);
 
     // 初始显示
     refreshDisplay();
@@ -75,7 +74,7 @@ void MainWindow::setupUI() {
     );
     connect(m_expandButton, &QPushButton::clicked, this, &MainWindow::toggleExpanded);
     m_mainLayout->addWidget(m_expandButton);
-    m_expandButton->hide();  // 初始隐藏
+    m_expandButton->hide(); // 初始隐藏
 
     // 创建空状态标签
     m_emptyLabel = new QLabel("当前未设置状态", this);
@@ -140,11 +139,22 @@ void MainWindow::savePosition() {
     settings.setValue("windowPosition", pos());
 }
 
+bool operator==(const QVector<StatusData> &lhs, const QVector<StatusData> &rhs) {
+    if (lhs.size() != rhs.size()) return false;
+    for (int i = 0; i < lhs.size(); ++i) {
+        if (!(lhs[i] == rhs[i])) return false;
+    }
+    return true;
+}
+
 void MainWindow::refreshDisplay() {
-    clearIcons();
-
     QVector<StatusData> activeStatuses = m_statusManager->getActiveStatuses();
-
+    if (m_statusesTemp == activeStatuses) {
+        return;
+    } else {
+        clearIcons();
+        m_statusesTemp = activeStatuses;
+    }
     if (activeStatuses.isEmpty()) {
         // 显示空状态标签
         m_iconLayout->addWidget(m_emptyLabel, 0, 0);
@@ -218,19 +228,19 @@ void MainWindow::createIconLabel(const StatusData &status) {
 
     // 设置Tooltip
     QString tooltip = QString("<div style='padding: 5px;'>"
-                              "<p style='font-size: 16px; margin: 0;'><b>%1 %2</b></p>"
-                              "<p style='margin: 5px 0 0 0; color: gray;'>%3</p>"
-                              "</div>")
-        .arg(status.icon)
-        .arg(status.description)
-        .arg(status.getShortTimeRange());
+                "<p style='font-size: 16px; margin: 0;'><b>%1 %2</b></p>"
+                "<p style='margin: 5px 0 0 0; color: gray;'>%3</p>"
+                "</div>")
+            .arg(status.icon)
+            .arg(status.description)
+            .arg(status.getShortTimeRange());
     label->setToolTip(tooltip);
 
     m_iconLabels.append(label);
 }
 
 void MainWindow::clearIcons() {
-    for (QLabel *label : m_iconLabels) {
+    for (QLabel *label: m_iconLabels) {
         m_iconLayout->removeWidget(label);
         label->deleteLater();
     }
